@@ -32,7 +32,10 @@ except:
         "PRIVATE_IP_ADDRESS": "192.168.0.1",
         "HOSTNAME": "election-orchestra",
         "PORT": 5000,
-        "KEYSTORE_PASS": "supersecret"
+        "KEYSTORE_PASS": "supersecret",
+        "TLS_CERT_PATH": "/srv/certs/selfsigned/cert.pem",
+        "TLS_CERT_KEY_PATH": "/srv/certs/selfsigned/key-nopass.pem",
+        "TLS_CALIST_PATH": "/srv/certs/selfsigned/calist"
     }
 
 PEER_LIST = CONFIG['PEER_LIST']
@@ -145,14 +148,14 @@ def install(PEER_LIST, path, keystore=None):
         subprocess.call("echo '%s' >> /etc/hosts" % hostline, shell=True)
 
     # add to ssl certs
-    with open("/srv/certs/selfsigned/calist", "r") as f:
+    with open(CONFIG["TLS_CALIST_PATH"], "r") as f:
         calist_data = f.read().strip()
     if el_json["ssl_certificate"] not in calist_data:
-        subprocess.call("echo '%s' >> /srv/certs/selfsigned/calist" %
-            el_json["ssl_certificate"], shell=True)
+        subprocess.call("echo '%s' >> %s" % (
+            el_json["ssl_certificate"], CONFIG["TLS_CALIST_PATH"]), shell=True)
 
     try:
-        shutil.copyfile("/srv/certs/selfsigned/calist", "/home/eorchestra/election-orchestra/certs/selfsigned/calist")
+        shutil.copyfile(CONFIG["TLS_CALIST_PATH"], "/home/eorchestra/election-orchestra/certs/selfsigned/calist")
     except:
         # It's not critical if the eorchestra is not installed. This is
         # optional
@@ -201,14 +204,16 @@ def uninstall(PEER_LIST, hostname, keystore=None):
         f.write(data)
 
     # remove from ssl certs
-    with open('/srv/certs/selfsigned/calist', 'r') as f:
+    with open(CONFIG["TLS_CALIST_PATH"], 'r') as f:
         data = f.read()
     data = data.replace(el_json["ssl_certificate"], "")
-    with open('/srv/certs/selfsigned/calist', 'w') as f:
+    with open(CONFIG["TLS_CALIST_PATH"], 'w') as f:
         f.write(data)
 
     try:
-        shutil.copyfile("/srv/certs/selfsigned/calist", "/home/eorchestra/election-orchestra/certs/selfsigned/calist")
+        shutil.copyfile(
+            CONFIG["TLS_CALIST_PATH"],
+            "/home/eorchestra/election-orchestra/certs/selfsigned/calist")
     except:
         # It's not critical if the eorchestra is not installed. This is
         # optional
@@ -226,7 +231,7 @@ def showmine(pargs):
     '''
     install the peer package by path
     '''
-    with open('/srv/certs/selfsigned/cert.pem', 'r') as f:
+    with open(CONFIG["TLS_CERT_PATH"], 'r') as f:
         ssl_certificate =  f.read()
     ip = PRIVATE_IP_ADDRESS if pargs.private_ip else PUBLIC_IP_ADDRESS
     us = {
