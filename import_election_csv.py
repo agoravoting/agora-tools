@@ -185,7 +185,7 @@ def blocks_to_election(blocks, config, add_to_id=0):
         return dictionary[key]
 
     start_date = datetime.strptime("10/10/2015 10:10", "%d/%m/%Y %H:%M")
-    if "Start date time" in election and election["Start date time"]) > 0:
+    if "Start date time" in election and election["Start date time"] > 0:
         try:
             start_date = datetime.strptime(election["Start date time"], "%d/%m/%Y %H:%M:%S")
         except:
