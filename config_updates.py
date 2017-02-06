@@ -193,8 +193,8 @@ def create_verifiable_results(config, elections_path, ids_path, tallies_path, pa
                 os.path.join(elections_path, "%s.results.pdf" % eid)
             ]
             if not check_files(paths):
-                print("cant read files")
-                exit(1)
+                print("cant read files for %s (no results), ignoring it" % eid)
+                continue
             for path in paths:
                 copy2(path, os.path.join(temp_path, os.path.basename(path)))
 
