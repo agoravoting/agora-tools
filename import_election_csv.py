@@ -92,6 +92,8 @@ def parse_extra(q):
   )
   if "shuffle_category_list" in val:
       val["shuffle_category_list"] = parse_list(val["shuffle_category_list"])
+  if "select_categories_1click" in val:
+      val["select_categories_1click"] = parse_bool(val["select_categories_1click"])
   if "shuffle_categories" in val:
       val["shuffle_categories"] = parse_bool(val["shuffle_categories"])
   if "shuffle_all_options" in val:
